@@ -1,7 +1,7 @@
 # Rememind
 A simple Discord bot that will remind you of things that your brain can't
 
-## Current Commands
+## Current Commands: //
 1. //help
    - Self explanatory dimwit
 2. //s
