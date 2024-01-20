@@ -18,3 +18,5 @@ A simple Discord bot that will remind you of things that your brain can't
        - MM: minute
 5. //dl
    - Allows you to delete a reminder
+
+**Note: Time related to the //d command is set in EST**
