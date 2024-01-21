@@ -23,11 +23,15 @@ async def on_ready():
 async def reminder_loop():
     current_time = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
     for reminder in reminders:
-        date_type, user_id, message, reminder_time = reminder
+        date_type, user_id, message, reminder_time, channel = reminder
 
         if current_time >= reminder_time:
             user = bot.get_user(user_id)
-            if user:
+            if channel:
+                at_user = f'<@{user_id}>'
+                await channel.send(f'bruh wtf is userid be fr {user_id}')
+                await channel.send(f'{at_user}: {message}')
+            elif user:
                 await user.send(f'{message}')
             reminders.remove(reminder)
 
@@ -57,7 +61,7 @@ async def t(ctx, time_unit: str, duration: float):
 
     user_id = ctx.author.id
     date_type = 'time'
-    reminders.append((date_type, user_id, reminder_message, reminder_time))
+    reminders.append((date_type, user_id, reminder_message, reminder_time, ctx.channel))
     await ctx.send(f'Timer set for {duration} {time_unit}.')
 
 
@@ -89,7 +93,7 @@ async def d(ctx, date: str, input_time: str):
     user_id = ctx.author.id
     date_type = 'date'
 
-    reminders.append((date_type, user_id, reminder_message, user_datetime_utc.timestamp()))
+    reminders.append((date_type, user_id, reminder_message, user_datetime_utc.timestamp(), ctx.channel))
     await ctx.send(f'Reminder set for {reminder_datetime.strftime("%m/%d/%Y %H:%M")}')
 
 
@@ -107,11 +111,14 @@ async def s(ctx):
     user_reminders = [reminder for reminder in reminders if reminder[1] == ctx.author.id]
     sorted_reminders = sorted(user_reminders, key=lambda x: x[3] - current_time)
     for i, reminder in enumerate(sorted_reminders, 1):
-        date_type, user_id, reminder_message, reminder_time = reminder
+        date_type, user_id, reminder_message, reminder_time, channel = reminder
         remaining_time = reminder_time - current_time
         hour, remainder = divmod(remaining_time, 3600)
         minutes, seconds = divmod(remainder, 60)
-        output_string = f'{output_string}\n{i}. {reminder_message} : {str(int(hour)).zfill(2)}:{str(int(minutes)).zfill(2)}:{str(int(seconds)).zfill(2)}'
+        if remaining_time < 0:
+            output_string = f'{output_string}\n{i}. {reminder_message} : Any second now...!'
+        else:
+            output_string = f'{output_string}\n{i}. {reminder_message} : {str(int(hour)).zfill(2)}:{str(int(minutes)).zfill(2)}:{str(int(seconds)).zfill(2)}'
 
     await ctx.send(output_string)
 
@@ -128,11 +135,14 @@ async def dl(ctx):
     user_reminders = [reminder for reminder in reminders if reminder[1] == ctx.author.id]
     sorted_reminders = sorted(user_reminders, key=lambda x: x[3] - current_time)
     for i, reminder in enumerate(sorted_reminders, 1):
-        date_type, user_id, reminder_message, reminder_time = reminder
+        date_type, user_id, reminder_message, reminder_time, channel = reminder
         remaining_time = reminder_time - current_time
         hour, remainder = divmod(remaining_time, 3600)
         minutes, seconds = divmod(remainder, 60)
-        output_string = f'{output_string}\n{i}. {reminder_message}: {str(int(hour)).zfill(2)}:{str(int(minutes)).zfill(2)}:{str(int(seconds)).zfill(2)}'
+        if remaining_time < 0:
+            output_string = f'{output_string}\n{i}. {reminder_message} : Any second now...!'
+        else:
+            output_string = f'{output_string}\n{i}. {reminder_message} : {str(int(hour)).zfill(2)}:{str(int(minutes)).zfill(2)}:{str(int(seconds)).zfill(2)}'
 
     await ctx.send(output_string)
 
